@@ -1,33 +1,40 @@
 import streamlit as st
 from utils.loader import load_data
 from utils.analyzer import analyze_devices
+from utils.database import save_to_database
+from utils.charts import (
+    battery_chart,
+    status_chart,
+    hospital_chart,
+    error_chart
+)
 
 # ================= Page Configuration =================
 st.set_page_config(page_title="MediLog", layout="wide")
 
-# ================= Title =================
 st.title("🏥 MediLog")
 
-# ================= Load and Analyze Data =================
+# ================= Load Data =================
 df = load_data()
 df = analyze_devices(df)
+save_to_database(df)
 
-# ================= Sidebar Filters =================
+# ================= Sidebar =================
 st.sidebar.header("Filters")
 
 hospital = st.sidebar.selectbox(
     "Hospital",
-    ["All"] + sorted(df["Hospital_Name"].unique().tolist())
+    ["All"] + sorted(df["Hospital_Name"].unique())
 )
 
 status = st.sidebar.selectbox(
     "Status",
-    ["All"] + sorted(df["Status"].unique().tolist())
+    ["All"] + sorted(df["Status"].unique())
 )
 
 error_code = st.sidebar.selectbox(
     "Error Code",
-    ["All"] + sorted(df["Error_Code"].unique().tolist())
+    ["All"] + sorted(df["Error_Code"].unique())
 )
 
 attention = st.sidebar.selectbox(
@@ -35,7 +42,7 @@ attention = st.sidebar.selectbox(
     ["All", "Yes", "No"]
 )
 
-# ================= Apply Filters =================
+# ================= Filters =================
 filtered_df = df.copy()
 
 if hospital != "All":
@@ -58,22 +65,41 @@ if attention != "All":
         filtered_df["Requires_Attention"] == attention
     ]
 
-# ================= Dashboard Metrics =================
-total_devices = len(filtered_df)
-healthy_devices = len(filtered_df[filtered_df["Status"] == "Healthy"])
-warning_devices = len(filtered_df[filtered_df["Status"] == "Warning"])
-critical_devices = len(filtered_df[filtered_df["Status"] == "Critical"])
+# ================= Metrics =================
+total = len(filtered_df)
+healthy = len(filtered_df[filtered_df["Status"] == "Healthy"])
+warning = len(filtered_df[filtered_df["Status"] == "Warning"])
+critical = len(filtered_df[filtered_df["Status"] == "Critical"])
 
-col1, col2, col3, col4 = st.columns(4)
+c1, c2, c3, c4 = st.columns(4)
 
-col1.metric("Total Devices", total_devices)
-col2.metric("Healthy", healthy_devices)
-col3.metric("Warning", warning_devices)
-col4.metric("Critical", critical_devices)
+c1.metric("Total Devices", total)
+c2.metric("Healthy", healthy)
+c3.metric("Warning", warning)
+c4.metric("Critical", critical)
 
 st.divider()
 
-# ================= Device Table =================
+# ================= Charts =================
+chart1, chart2 = st.columns(2)
+
+with chart1:
+    st.pyplot(battery_chart(filtered_df))
+
+with chart2:
+    st.pyplot(status_chart(filtered_df))
+
+chart3, chart4 = st.columns(2)
+
+with chart3:
+    st.pyplot(hospital_chart(filtered_df))
+
+with chart4:
+    st.pyplot(error_chart(filtered_df))
+
+st.divider()
+
+# ================= Table =================
 st.subheader("Device Logs")
 
 st.dataframe(filtered_df, use_container_width=True)
