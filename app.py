@@ -1,14 +1,16 @@
 import streamlit as st
 from utils.loader import load_data
+from utils.analyzer import analyze_devices
 
-# Page Configuration
+# ================= Page Configuration =================
 st.set_page_config(page_title="MediLog", layout="wide")
 
-# Title
+# ================= Title =================
 st.title("🏥 MediLog")
 
-# Load Data
+# ================= Load and Analyze Data =================
 df = load_data()
+df = analyze_devices(df)
 
 # ================= Sidebar Filters =================
 st.sidebar.header("Filters")
@@ -28,6 +30,11 @@ error_code = st.sidebar.selectbox(
     ["All"] + sorted(df["Error_Code"].unique().tolist())
 )
 
+attention = st.sidebar.selectbox(
+    "Requires Attention",
+    ["All", "Yes", "No"]
+)
+
 # ================= Apply Filters =================
 filtered_df = df.copy()
 
@@ -44,6 +51,11 @@ if status != "All":
 if error_code != "All":
     filtered_df = filtered_df[
         filtered_df["Error_Code"] == error_code
+    ]
+
+if attention != "All":
+    filtered_df = filtered_df[
+        filtered_df["Requires_Attention"] == attention
     ]
 
 # ================= Dashboard Metrics =================
