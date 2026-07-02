@@ -1,0 +1,28 @@
+
+MediLog Report
+==========================
+
+Generated On : 03-07-2026 02:24:05
+
+Total Devices : 179
+Healthy Devices : 0
+Warning Devices : 0
+Critical Devices : 179
+
+Top 5 Error Codes
+
+Error_Code
+E202    40
+None    38
+E404    34
+E101    34
+E303    33
+
+Hospitals with Most Devices
+
+Hospital_Name
+City Hospital      38
+Apollo Hospital    38
+Sunrise Medical    38
+Care Plus          34
+Metro Hospital     31

@@ -8,6 +8,8 @@ from utils.charts import (
     hospital_chart,
     error_chart
 )
+from datetime import datetime
+import os
 
 # ================= Page Configuration =================
 st.set_page_config(page_title="MediLog", layout="wide")
@@ -78,6 +80,39 @@ c2.metric("Healthy", healthy)
 c3.metric("Warning", warning)
 c4.metric("Critical", critical)
 
+# ================= Report =================
+if st.button("Generate Report"):
+
+    os.makedirs("reports", exist_ok=True)
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"reports/device_report_{timestamp}.txt"
+
+    report = f"""
+MediLog Report
+==========================
+
+Generated On : {datetime.now().strftime("%d-%m-%Y %H:%M:%S")}
+
+Total Devices : {total}
+Healthy Devices : {healthy}
+Warning Devices : {warning}
+Critical Devices : {critical}
+
+Top 5 Error Codes
+
+{filtered_df["Error_Code"].value_counts().head().to_string()}
+
+Hospitals with Most Devices
+
+{filtered_df["Hospital_Name"].value_counts().head().to_string()}
+"""
+
+    with open(filename, "w") as file:
+        file.write(report)
+
+    st.success(f"Report saved as {filename}")
+
 st.divider()
 
 # ================= Charts =================
@@ -99,7 +134,7 @@ with chart4:
 
 st.divider()
 
-# ================= Table =================
+# ================= Device Table =================
 st.subheader("Device Logs")
 
 st.dataframe(filtered_df, use_container_width=True)

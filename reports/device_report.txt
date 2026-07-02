@@ -1,0 +1,18 @@
+
+MediLog Report
+=========================
+
+Total Devices : 4
+Healthy Devices : 0
+Warning Devices : 0
+Critical Devices : 4
+
+Top 5 Error Codes
+
+Error_Code
+E101    4
+
+Hospitals with Most Devices
+
+Hospital_Name
+Care Plus    4
