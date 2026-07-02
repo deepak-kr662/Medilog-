@@ -1,17 +1,56 @@
 import streamlit as st
 from utils.loader import load_data
 
+# Page Configuration
 st.set_page_config(page_title="MediLog", layout="wide")
 
+# Title
 st.title("🏥 MediLog")
 
+# Load Data
 df = load_data()
 
-# Dashboard Metrics
-total_devices = len(df)
-healthy_devices = len(df[df["Status"] == "Healthy"])
-warning_devices = len(df[df["Status"] == "Warning"])
-critical_devices = len(df[df["Status"] == "Critical"])
+# ================= Sidebar Filters =================
+st.sidebar.header("Filters")
+
+hospital = st.sidebar.selectbox(
+    "Hospital",
+    ["All"] + sorted(df["Hospital_Name"].unique().tolist())
+)
+
+status = st.sidebar.selectbox(
+    "Status",
+    ["All"] + sorted(df["Status"].unique().tolist())
+)
+
+error_code = st.sidebar.selectbox(
+    "Error Code",
+    ["All"] + sorted(df["Error_Code"].unique().tolist())
+)
+
+# ================= Apply Filters =================
+filtered_df = df.copy()
+
+if hospital != "All":
+    filtered_df = filtered_df[
+        filtered_df["Hospital_Name"] == hospital
+    ]
+
+if status != "All":
+    filtered_df = filtered_df[
+        filtered_df["Status"] == status
+    ]
+
+if error_code != "All":
+    filtered_df = filtered_df[
+        filtered_df["Error_Code"] == error_code
+    ]
+
+# ================= Dashboard Metrics =================
+total_devices = len(filtered_df)
+healthy_devices = len(filtered_df[filtered_df["Status"] == "Healthy"])
+warning_devices = len(filtered_df[filtered_df["Status"] == "Warning"])
+critical_devices = len(filtered_df[filtered_df["Status"] == "Critical"])
 
 col1, col2, col3, col4 = st.columns(4)
 
@@ -22,5 +61,7 @@ col4.metric("Critical", critical_devices)
 
 st.divider()
 
+# ================= Device Table =================
 st.subheader("Device Logs")
-st.dataframe(df)
+
+st.dataframe(filtered_df, use_container_width=True)
