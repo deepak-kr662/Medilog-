@@ -193,12 +193,6 @@ Some ideas for extending the project:
 
 ---
 
-## Screenshots
-
-_Add dashboard screenshots here._
-
----
-
 ## Author
 
 **Deepak Kumar**
